@@ -1,4 +1,4 @@
-package org;
+package main;
 public class Client {
 
     private int id;
