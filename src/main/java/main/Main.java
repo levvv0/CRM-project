@@ -4,21 +4,25 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ClientService service = new ClientService();
+        ClientFileService fileService = new ClientFileService();
+        ClientRepository repository = new InMemoryClientRepository(fileService.loadFile());
 
-        while(true){
+        ClientService service = new ClientService(repository);
+
+
+        while (true) {
 
             System.out.println("CRM");
             System.out.println("1. Add Client");
             System.out.println("2. Get Clients");
-            System.out.println("3. Delete by ID");
+            System.out.println("3. Delete client");
             System.out.println("4. Update Client");
             System.out.println("5: Find Client by ID");
             System.out.println("6: Exit");
 
             int choise = scanner.nextInt();
             scanner.nextLine();
-            switch(choise){
+            switch (choise) {
                 case 1:
 
                     System.out.println("Name: ");
@@ -27,15 +31,20 @@ public class Main {
                     String phone = scanner.nextLine();
                     System.out.println("Email: ");
                     String email = scanner.nextLine();
+                    try {
+                        service.addClient(name, phone, email);
+                        System.out.println("Client added");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    fileService.saveToFile(service.getAllClients());
 
-                    service.addClient(name, phone, email);
-                    System.out.println("Client added");
                     break;
 
                 case 2:
 
                     System.out.println("Clients: ");
-                    for(Client client : service.getAllClients()){
+                    for (Client client : service.getAllClients()) {
                         System.out.println(client);
                     }
                     break;
@@ -44,15 +53,34 @@ public class Main {
 
                     System.out.println("Print ID");
                     int id = scanner.nextInt();
-                    service.deleteById(id);
+                    Client clientD = service.findById(id);
+                    service.delete(clientD);
                     System.out.println("Client deleted");
+                    fileService.saveToFile(service.getAllClients());
+
                     break;
                 case 4:
+                    System.out.println("Print ID");
+                    int id2 = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.println("New Name: ");
+                    String Nname = scanner.nextLine();
+                    System.out.println("New Phone: ");
+                    String Nphone = scanner.nextLine();
+                    System.out.println("New Email: ");
+                    String Nemail = scanner.nextLine();
+                    boolean updatedC;
 
-                    System.out.println("Print Client ID: ");
-                    id = scanner.nextInt();
-                    Client client = service.findById(id);
-                    service.updateClient(id, client);
+                    try {
+                        updatedC = service.updateClient(id2, Nname, Nphone, Nemail);
+                        if (updatedC) System.out.println("Client was updated");
+                        else System.out.println("Client not found");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    fileService.saveToFile(service.getAllClients());
+
+
                     break;
 
                 case 5:
@@ -61,9 +89,8 @@ public class Main {
                     id = scanner.nextInt();
 
                     Client clientg = service.findById(id);
-                    if(clientg == null) System.out.println("Not found client with that id");
-                    else {System.out.println("Client: ");
-                    System.out.println(clientg);}
+                    System.out.println("Client: ");
+                    System.out.println(clientg);
                     break;
 
                 case 6:
