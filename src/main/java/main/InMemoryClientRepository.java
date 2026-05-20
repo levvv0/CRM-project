@@ -41,4 +41,14 @@ public class InMemoryClientRepository implements ClientRepository{
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    public void update(Client client){
+        for(int i = 0; i < clients.size(); i++){
+            if(client.getId() == clients.get(i).getId()){
+                clients.set(i, client);
+                return;
+            }
+        }
+    }
 }

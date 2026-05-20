@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface ClientRepository {
 
-    public void save(Client client);
+     void save(Client client);
 
-    public List<Client> findAll();
+     List<Client> findAll();
 
-    public void delete(Client client);
+     void delete(Client client);
 
-    public Client findById(int id);
+    Client findById(int id);
 
-    public Client findByPhone(String phone);
+    Client findByPhone(String phone);
+
+    void update(Client client);
 }

@@ -4,9 +4,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ClientFileService fileService = new ClientFileService();
-        ClientRepository repository = new InMemoryClientRepository(fileService.loadFile());
 
+        ClientRepository repository = new FileClientRepository();
         ClientService service = new ClientService(repository);
 
 
@@ -37,7 +36,6 @@ public class Main {
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
-                    fileService.saveToFile(service.getAllClients());
 
                     break;
 
@@ -56,7 +54,6 @@ public class Main {
                     Client clientD = service.findById(id);
                     service.delete(clientD);
                     System.out.println("Client deleted");
-                    fileService.saveToFile(service.getAllClients());
 
                     break;
                 case 4:
@@ -78,8 +75,6 @@ public class Main {
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
-                    fileService.saveToFile(service.getAllClients());
-
 
                     break;
 

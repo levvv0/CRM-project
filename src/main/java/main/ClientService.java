@@ -60,17 +60,14 @@ public class ClientService {
     }
 
     public boolean updateClient(int id, String name, String phone, String email){
-        validateClientData(
-                name,
-                phone,
-                email
-        );
+        validateClientData(phone, name, email);
 
         Client client = findById(id);
         if(client == null) return false;
         client.setName(name);
         client.setPhone(phone);
         client.setEmail(email);
+        repository.update(client);
         return true;
     }
 
