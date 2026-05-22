@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileClientRepository implements ClientRepository{
-    private String fileName = "clients.txt";
+    private final String fileName = "clients.txt";
     private List<Client> clients = new ArrayList<>();
 
 
