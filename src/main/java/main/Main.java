@@ -52,9 +52,11 @@ public class Main {
                     System.out.println("Print ID");
                     int id = scanner.nextInt();
                     Client clientD = service.findById(id);
-                    service.delete(clientD);
-                    System.out.println("Client deleted");
-
+                    if(clientD != null) {
+                        service.delete(clientD);
+                        System.out.println("Client deleted");
+                    }
+                    else System.out.println("Client with that ID not found");
                     break;
                 case 4:
                     System.out.println("Print ID");

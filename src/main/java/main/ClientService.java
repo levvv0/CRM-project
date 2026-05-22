@@ -60,8 +60,12 @@ public class ClientService {
     }
 
     public boolean updateClient(int id, String name, String phone, String email){
-        validateClientData(phone, name, email);
+        validateClientData(name, phone, email);
 
+        Client clientWithSamePhone = repository.findByPhone(phone);
+        if(clientWithSamePhone != null && clientWithSamePhone.getId() != id){
+            throw new IllegalArgumentException("This phone is already used");
+        }
         Client client = findById(id);
         if(client == null) return false;
         client.setName(name);
