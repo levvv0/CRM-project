@@ -8,7 +8,7 @@ public interface ClientRepository {
 
      List<Client> findAll();
 
-     void delete(Client client);
+     void deleteById(int id);
 
     Client findById(int id);
 

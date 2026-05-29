@@ -30,7 +30,8 @@ public class InMemoryClientRepository implements ClientRepository{
     }
 
     @Override
-    public void delete(Client client){
+    public void deleteById(int id){
+        Client client = findById(id);
         clients.remove(client);
     }
 

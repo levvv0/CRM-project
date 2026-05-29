@@ -54,9 +54,10 @@ public class ClientService {
         return repository.findById(id);
     }
 
-    public void delete(Client client){
-        if(client != null){ repository.delete(client); }
-        else return;
+    public boolean deleteById(int id){
+        Client client = findById(id);
+        if(client != null){ repository.deleteById(id); return true;}
+        else return false;
     }
 
     public boolean updateClient(int id, String name, String phone, String email){
