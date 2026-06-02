@@ -74,13 +74,14 @@ public class ClientServiceTest {
     }
 
     @Test
-    void updateClient_shouldUpdateClient(){
-        service.addClient("Lev", "123", "email");
-        boolean result = service.updateClient(1, "Pen", "321", "pen@gmail.com");
+    void updateClient_existingClient_shouldUpdateClient(){
+        service.addClient("Lev", "123", "lev@gmial.com");
+        Client newClient = service.getAllClients().get(0);
+        int clientId = newClient.getId();
+        boolean result = service.updateClient(clientId, "Pen", "321", "pen@gmail.com");
 
         assertTrue(result);
-
-        Client client = service.findById(1);
+        Client client = service.findById(clientId);
         assertEquals("Pen", client.getName());
         assertEquals("321", client.getPhone());
         assertEquals("pen@gmail.com", client.getEmail());
@@ -106,10 +107,48 @@ public class ClientServiceTest {
     }
 
     @Test
-    void deleteClientById_shouldReturnFalse(){
+    void deleteClientById_notExistingClient_shouldReturnFalse(){
         int id = 678;
         boolean result = service.deleteById(id);
 
         assertFalse(result);
+    }
+
+    @Test
+    void updateClient_duplicatePhone_shouldThrowException(){
+        service.addClient("Lev", "123", "lev@gmail.com");
+        service.addClient("Pen", "321", "lev@gmail.com");
+        Client client2 = service.getAllClients().get(1);
+        int cId = client2.getId();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            service.updateClient(cId, "Bob", "123", "bob@gmail.com");
+        });
+    }
+
+    @Test
+    void updateClient_samePhoneForSameClient_shouldUpdate(){
+        service.addClient("Lev", "123", "lev@gmail.com");
+        Client client = service.getAllClients().get(0);
+        int id = client.getId();
+
+        boolean result = service.updateClient(id, "Lev upd", "123", "uplev@gmail.com");
+
+        assertTrue(result);
+        Client updatedClient = service.findById(id);
+
+        assertEquals("Lev upd", client.getName());
+        assertEquals("123", client.getPhone());
+        assertEquals("uplev@gmail.com", client.getEmail());
+    }
+
+    @Test
+    void addClient_shouldTrimClientData(){
+        service.addClient("  Lev  ", "  123  ", "  lev@gmail.com  ");
+        Client client = service.getAllClients().get(0);
+
+        assertEquals("Lev", client.getName());
+        assertEquals("123", client.getPhone());
+        assertEquals("lev@gmail.com", client.getEmail());
     }
 }

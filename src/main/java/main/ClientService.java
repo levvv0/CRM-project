@@ -27,15 +27,25 @@ public class ClientService {
         }
     }
 
-    private void checkUniqueNumber(String phone){
+    private void checkUniquePhoneForAdd(String phone){
         if(repository.findByPhone(phone) != null){
             throw new IllegalArgumentException("Client with that number already exists");
         }
     }
 
+    private void checkUniquePhoneForUpdate(int id, String phone){
+        Client clientWithSamePhone = repository.findByPhone(phone);
+        if(clientWithSamePhone != null && clientWithSamePhone.getId() != id){
+            throw new IllegalArgumentException("This phone is already used");
+        }
+    }
+
     public void addClient(String name, String phone, String email){
+        name = normalize(name);
+        phone = normalize(phone);
+        email = normalize(email);
         validateClientData(name, phone, email);
-        checkUniqueNumber(phone);
+        checkUniquePhoneForAdd(phone);
         Client client = new Client.ClientBuilder()
                 .SId(nextId)
                 .SName(name)
@@ -61,14 +71,16 @@ public class ClientService {
     }
 
     public boolean updateClient(int id, String name, String phone, String email){
-        validateClientData(name, phone, email);
-
-        Client clientWithSamePhone = repository.findByPhone(phone);
-        if(clientWithSamePhone != null && clientWithSamePhone.getId() != id){
-            throw new IllegalArgumentException("This phone is already used");
-        }
         Client client = findById(id);
         if(client == null) return false;
+
+        name = normalize(name);
+        phone = normalize(phone);
+        email = normalize(email);
+
+        validateClientData(name, phone, email);
+        checkUniquePhoneForUpdate(id, phone);
+
         client.setName(name);
         client.setPhone(phone);
         client.setEmail(email);
@@ -78,5 +90,10 @@ public class ClientService {
 
     public Client findByPhone(String phone){
         return repository.findByPhone(phone);
+    }
+
+    private String normalize(String value){
+        if(value == null) return null;
+        return value.trim();
     }
 }
