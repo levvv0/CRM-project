@@ -1,4 +1,5 @@
 package main;
+import javax.xml.crypto.Data;
 import java.util.Scanner;
 
 public class Main {
@@ -6,8 +7,13 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         ClientRepository repository = new JdbcClientRepository();
-        ClientService service = new ClientService(repository);
-
+        ClientService service;
+        try {
+            service = new ClientService(repository);
+        } catch(DatabaseException e){
+            System.out.println("Darabase error during application startup :" + e.getMessage());
+            return;
+        }
 
         while (true) {
 
@@ -35,24 +41,35 @@ public class Main {
                         System.out.println("Client added");
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
+                    } catch (DatabaseException e){
+                        System.out.println("Database error :" + e.getMessage());
                     }
 
                     break;
 
                 case 2:
 
-                    System.out.println("Clients: ");
-                    for (Client client : service.getAllClients()) {
-                        System.out.println(client);
+                    try {
+                        System.out.println("Clients: ");
+                        for (Client client : service.getAllClients()) {
+                            System.out.println(client);
+                        }
+                    } catch(DatabaseException e){
+                        System.out.println("Database error :" + e.getMessage());
                     }
+
                     break;
 
                 case 3:
 
                     System.out.println("Print ID");
                     int id = scanner.nextInt();
-                    if(service.deleteById(id)) System.out.println("Client deleted");
-                    else System.out.println("Client with that ID not found");
+                    try{
+                        if (service.deleteById(id)) System.out.println("Client deleted");
+                        else System.out.println("Client with that ID not found");
+                    } catch(DatabaseException e){
+                        System.out.println("Database error:" + e.getMessage());
+                    }
                     break;
                 case 4:
                     System.out.println("Print ID");
@@ -72,6 +89,8 @@ public class Main {
                         else System.out.println("Client not found");
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
+                    } catch(DatabaseException e){
+                        System.out.println("Database error :" + e.getMessage());
                     }
 
                     break;
@@ -81,9 +100,18 @@ public class Main {
                     System.out.println("Print ID:");
                     id = scanner.nextInt();
 
-                    Client clientg = service.findById(id);
-                    System.out.println("Client: ");
-                    System.out.println(clientg);
+                    try {
+                        Client clientg = service.findById(id);
+                        if (clientg != null) {
+                            System.out.println("Client: ");
+                            System.out.println(clientg);
+                        } else {
+                            System.out.println("Client is not found");
+                        }
+                    } catch(DatabaseException e){
+                        System.out.println("Database error:" + e.getMessage());
+                    }
+
                     break;
 
                 case 6:

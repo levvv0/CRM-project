@@ -21,7 +21,7 @@ public class JdbcClientRepository implements ClientRepository {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error while saving client: " + e.getMessage());
+            throw new DatabaseException("Error while saving client: ", e);
         }
     }
 
@@ -44,7 +44,7 @@ public class JdbcClientRepository implements ClientRepository {
                 clients.add(client);
             }
         } catch (SQLException e) {
-            System.out.println("Error while finding all clients" + e.getMessage());
+            throw new DatabaseException("Error while finding all clients", e);
         }
 
         return clients;
@@ -71,7 +71,7 @@ public class JdbcClientRepository implements ClientRepository {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error while finding client by id: " + e.getMessage());
+            throw new DatabaseException("Error while finding client by id: ", e);
         }
 
         return null;
@@ -97,7 +97,7 @@ public class JdbcClientRepository implements ClientRepository {
                 }
             }
         }   catch(SQLException e){
-            System.out.println("Error while finding client by phone" + e.getMessage());
+            throw new DatabaseException("Error while finding client by phone", e);
         }
         return null;
 
@@ -135,7 +135,7 @@ public class JdbcClientRepository implements ClientRepository {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch(SQLException e){
-            System.out.println("Error while deleted client by id" + e.getMessage());
+            throw new DatabaseException("Error while deleted client by id", e);
         }
 
     }
