@@ -1,0 +1,142 @@
+package main;
+
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+public class JdbcClientRepository implements ClientRepository {
+
+    @Override
+    public void save(Client client) {
+        String sql = """
+                INSERT INTO clients (id, name, phone, email)
+                VALUES (?, ?, ?, ?)
+                """;
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, client.getId());
+            statement.setString(2, client.getName());
+            statement.setString(3, client.getPhone());
+            statement.setString(4, client.getEmail());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error while saving client: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Client> findAll() {
+
+        List<Client> clients = new ArrayList<>();
+        String sql = "SELECT * FROM clients";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                Client client = new Client.ClientBuilder()
+                        .SId(resultSet.getInt("id"))
+                        .SName(resultSet.getString("name"))
+                        .SPhone(resultSet.getString("phone"))
+                        .SEmail(resultSet.getString("email"))
+                        .build();
+                clients.add(client);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error while finding all clients" + e.getMessage());
+        }
+
+        return clients;
+    }
+
+    @Override
+    public Client findById(int id) {
+
+        String sql = "SELECT * FROM clients WHERE id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, id);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Client.ClientBuilder()
+                            .SId(resultSet.getInt("id"))
+                            .SName(resultSet.getString("name"))
+                            .SPhone(resultSet.getString("phone"))
+                            .SEmail(resultSet.getString("email"))
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error while finding client by id: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    @Override
+    public Client findByPhone(String phone){
+        String sql = "SELECT * FROM clients WHERE phone = ?";
+
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, phone);
+
+            try(ResultSet resultSet = statement.executeQuery()){
+                if(resultSet.next()){
+                    return new Client.ClientBuilder()
+                            .SId(resultSet.getInt("id"))
+                            .SName(resultSet.getString("name"))
+                            .SPhone(resultSet.getString("phone"))
+                            .SEmail(resultSet.getString("email"))
+                            .build();
+                }
+            }
+        }   catch(SQLException e){
+            System.out.println("Error while finding client by phone" + e.getMessage());
+        }
+        return null;
+
+    }
+
+    @Override
+    public void update(Client client){
+        String sql = """
+                UPDATE clients  
+                SET name = ?, phone = ?, email = ?
+                WHERE id = ?""";
+
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setString(1, client.getName());
+            statement.setString(2, client.getPhone());
+            statement.setString(3, client.getEmail());
+            statement.setInt(4, client.getId());
+
+            statement.executeUpdate();
+        } catch(SQLException e){
+            System.out.println("Error while updating client" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteById(int id){
+
+        String sql = "DELETE FROM clients WHERE id = ?";
+
+        try(Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        } catch(SQLException e){
+            System.out.println("Error while deleted client by id" + e.getMessage());
+        }
+
+    }
+}

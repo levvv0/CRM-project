@@ -2,8 +2,13 @@ package main;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ClientServiceTest {
 
     private ClientRepository repository;
@@ -137,9 +142,9 @@ public class ClientServiceTest {
         assertTrue(result);
         Client updatedClient = service.findById(id);
 
-        assertEquals("Lev upd", client.getName());
-        assertEquals("123", client.getPhone());
-        assertEquals("uplev@gmail.com", client.getEmail());
+        assertEquals("Lev upd", updatedClient.getName());
+        assertEquals("123", updatedClient.getPhone());
+        assertEquals("uplev@gmail.com", updatedClient.getEmail());
     }
 
     @Test

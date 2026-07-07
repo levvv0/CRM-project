@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        ClientRepository repository = new FileClientRepository();
+        ClientRepository repository = new JdbcClientRepository();
         ClientService service = new ClientService(repository);
 
 
