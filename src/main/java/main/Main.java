@@ -4,6 +4,12 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        try {
+            DatabaseMigration.migrate();
+        } catch(DatabaseException e){
+            System.out.println("Database migration error :" + e.getMessage());
+            return;
+        }
         Scanner scanner = new Scanner(System.in);
 
         ClientRepository repository = new JdbcClientRepository();

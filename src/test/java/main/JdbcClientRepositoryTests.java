@@ -18,6 +18,7 @@ public class JdbcClientRepositoryTests {
     @BeforeEach
     void setUp() {
         System.setProperty("CRM_DB_URL", "jdbc:postgresql://localhost:5432/crm_test_db");
+        DatabaseMigration.migrate();
         repository = new JdbcClientRepository();
         clearClientsTable();
     }
