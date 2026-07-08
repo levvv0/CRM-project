@@ -11,7 +11,7 @@ public class Main {
         try {
             service = new ClientService(repository);
         } catch(DatabaseException e){
-            System.out.println("Darabase error during application startup :" + e.getMessage());
+            System.out.println("Database error during application startup :" + e.getMessage());
             return;
         }
 
