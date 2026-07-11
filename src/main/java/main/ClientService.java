@@ -4,15 +4,11 @@ import java.util.List;
 public class ClientService {
 
     private final ClientRepository repository;
-    private int nextId = 1;
 
     public ClientService(ClientRepository repository){
         this.repository = repository;
-        this.nextId = repository.findAll().stream()
-                .mapToInt(Client::getId)
-                .max()
-                .orElse(0)+1;
     }
+
     private void validateClientData(String name, String phone, String email){
         if(name == null || name.isBlank()) {
             throw new IllegalArgumentException("Name can not be empty");
@@ -47,13 +43,11 @@ public class ClientService {
         validateClientData(name, phone, email);
         checkUniquePhoneForAdd(phone);
         Client client = new Client.ClientBuilder()
-                .SId(nextId)
                 .SName(name)
                 .SPhone(phone)
                 .SEmail(email)
                 .build();
         repository.save(client);
-        nextId++;
     }
 
     public List<Client> getAllClients(){

@@ -5,18 +5,10 @@ public class ClientNoteService {
 
     private final ClientNoteRepository noteRepository;
     private final ClientRepository clientRepository;
-    private int nextId;
 
     public ClientNoteService(ClientNoteRepository noteRepository, ClientRepository clientRepository){
         this.noteRepository = noteRepository;
         this.clientRepository = clientRepository;
-
-        this.nextId = noteRepository.findAll().stream()
-                .mapToInt(ClientNote::getId)
-                .max()
-                .orElse(0) + 1;
-
-
     }
 
     public void addNote(int clientId, String noteText){
@@ -25,13 +17,11 @@ public class ClientNoteService {
         checkClientExists(clientId);
 
         ClientNote note = new ClientNote.ClientNoteBuilder()
-                .SId(nextId)
                 .SClientId(clientId)
                 .SNoteText(noteText)
                 .build();
 
         noteRepository.save(note);
-        nextId++;
     }
 
     public ClientNote finById(int id){

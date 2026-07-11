@@ -5,12 +5,19 @@ import java.util.ArrayList;
 public class InMemoryClientNoteRepository implements ClientNoteRepository {
 
     private final List<ClientNote> notes = new ArrayList<>();
+    private int nextId = 1;
 
     @Override
-    public void save(ClientNote note){
+    public void save(ClientNote note) {
+        if (note.getId() == 0) {
+            note.setId(nextId);
+            nextId++;
+        } else if (note.getId() >= nextId) {
+            nextId = note.getId() + 1;
+        }
+
         notes.add(note);
     }
-
     @Override
     public ClientNote findById(int id){
         return notes.stream()

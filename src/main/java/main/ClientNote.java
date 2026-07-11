@@ -31,6 +31,8 @@ public class ClientNote {
         return createdAt;
     }
 
+    public void setId(int id){this.id = id; }
+
     public void setNoteText(String noteText) {
         this.noteText = noteText;
     }

@@ -6,6 +6,7 @@ import java.util.List;
 public class InMemoryClientRepository implements ClientRepository{
 
     private List<Client> clients = new ArrayList<>();
+    private int nextId = 1;
 
     public InMemoryClientRepository(){}
 
@@ -13,7 +14,14 @@ public class InMemoryClientRepository implements ClientRepository{
         this.clients = new ArrayList<>(clients);
     }
     @Override
-    public void save(Client client){
+    public void save(Client client) {
+        if (client.getId() == 0) {
+            client.setId(nextId);
+            nextId++;
+        } else if (client.getId() >= nextId) {
+            nextId = client.getId() + 1;
+        }
+
         clients.add(client);
     }
 

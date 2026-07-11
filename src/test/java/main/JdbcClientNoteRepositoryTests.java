@@ -19,7 +19,7 @@ public class JdbcClientNoteRepositoryTests {
     private JdbcClientRepository clientRepository;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         System.setProperty("CRM_DB_URL", "jdbc:postgresql://localhost:5432/crm_test_db");
 
         DatabaseMigration.migrate();
@@ -40,7 +40,7 @@ public class JdbcClientNoteRepositoryTests {
     }
 
     @Test
-    void saveNote_shouldSaveNote(){
+    void saveNote_shouldSaveNote() {
         ClientNote note = new ClientNote.ClientNoteBuilder()
                 .SId(1)
                 .SClientId(1)
@@ -59,9 +59,9 @@ public class JdbcClientNoteRepositoryTests {
     }
 
     @Test
-    void findByClientId_shouldReturnClientNotes(){
+    void findByClientId_shouldReturnClientNotes() {
         ClientNote note1 = new ClientNote.ClientNoteBuilder()
-                 .SId(1)
+                .SId(1)
                 .SClientId(1)
                 .SNoteText("First note")
                 .build();
@@ -81,7 +81,7 @@ public class JdbcClientNoteRepositoryTests {
     }
 
     @Test
-    void findAll_shouldReturnAllNotes(){
+    void findAll_shouldReturnAllNotes() {
         ClientNote note1 = new ClientNote.ClientNoteBuilder()
                 .SId(1)
                 .SClientId(1)
@@ -103,7 +103,7 @@ public class JdbcClientNoteRepositoryTests {
     }
 
     @Test
-    void deleteById_shouldDeleteNote(){
+    void deleteById_shouldDeleteNote() {
         ClientNote note = new ClientNote.ClientNoteBuilder()
                 .SId(1)
                 .SClientId(1)
@@ -119,15 +119,23 @@ public class JdbcClientNoteRepositoryTests {
     }
 
     private void clearTables() {
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement deleteNotes = connection.prepareStatement("DELETE FROM client_notes");
-             PreparedStatement deleteClients = connection.prepareStatement("DELETE FROM clients")) {
+        String sql = """
+            
+                TRUNCATE TABLE client_notes, clients
+            RESTART IDENTITY CASCADE
+            """;
 
-            deleteNotes.executeUpdate();
-            deleteClients.executeUpdate();
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
+
+            statement.executeUpdate();
 
         } catch (SQLException e) {
-            throw new DatabaseException("Error while clearing test tables", e);
+            throw new DatabaseException(
+                    "Error while clearing test tables",
+                    e
+            );
         }
     }
 }

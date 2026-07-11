@@ -24,17 +24,23 @@ public class JdbcClientRepositoryTests {
     }
 
     private void clearClientsTable() {
-        String sql = "DELETE FROM CLIENTS";
+        String sql = """
+            TRUNCATE TABLE client_notes, clients
+            RESTART IDENTITY CASCADE
+            """;
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.executeUpdate();
+
         } catch (SQLException e) {
-            throw new DatabaseException("Error while clearing clients table :", e);
+            throw new DatabaseException(
+                    "Error while clearing test tables",
+                    e
+            );
         }
     }
-
 
     @Test
     void saveClient_shouldSaveClientToDatabase(){

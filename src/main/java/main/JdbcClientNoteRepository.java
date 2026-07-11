@@ -6,27 +6,48 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Statement;
 
 public class JdbcClientNoteRepository implements ClientNoteRepository {
 
     @Override
     public void save(ClientNote note) {
         String sql = """
-                INSERT INTO client_notes (id, client_id, note_text)
-                VALUES (?, ?, ?)
-                """;
+            INSERT INTO client_notes (client_id, note_text)
+            VALUES (?, ?)
+            """;
 
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(
+                     sql,
+                     Statement.RETURN_GENERATED_KEYS
+             )) {
 
-            statement.setInt(1, note.getId());
-            statement.setInt(2, note.getClientId());
-            statement.setString(3, note.getNoteText());
+            statement.setInt(1, note.getClientId());
+            statement.setString(2, note.getNoteText());
 
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Creating client note failed");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    note.setId(generatedId);
+                } else {
+                    throw new SQLException(
+                            "Creating client note failed, no ID was generated"
+                    );
+                }
+            }
 
         } catch (SQLException e) {
-            throw new DatabaseException("Error while saving client note", e);
+            throw new DatabaseException(
+                    "Error while saving client note",
+                    e
+            );
         }
     }
 

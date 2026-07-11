@@ -3,25 +3,46 @@ package main;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.sql.Statement;
+
 public class JdbcClientRepository implements ClientRepository {
 
     @Override
     public void save(Client client) {
         String sql = """
-                INSERT INTO clients (id, name, phone, email)
-                VALUES (?, ?, ?, ?)
-                """;
+            INSERT INTO clients (name, phone, email)
+            VALUES (?, ?, ?)
+            """;
+
         try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(
+                     sql,
+                     Statement.RETURN_GENERATED_KEYS
+             )) {
 
-            statement.setInt(1, client.getId());
-            statement.setString(2, client.getName());
-            statement.setString(3, client.getPhone());
-            statement.setString(4, client.getEmail());
+            statement.setString(1, client.getName());
+            statement.setString(2, client.getPhone());
+            statement.setString(3, client.getEmail());
 
-            statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Creating client failed");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    client.setId(generatedId);
+                } else {
+                    throw new SQLException(
+                            "Creating client failed, no ID was generated"
+                    );
+                }
+            }
+
         } catch (SQLException e) {
-            throw new DatabaseException("Error while saving client: ", e);
+            throw new DatabaseException("Error while saving client", e);
         }
     }
 
