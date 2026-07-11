@@ -1,131 +1,274 @@
 package main;
-import javax.xml.crypto.Data;
+
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
+
         try {
             DatabaseMigration.migrate();
-        } catch(DatabaseException e){
-            System.out.println("Database migration error :" + e.getMessage());
+        } catch (DatabaseException e) {
+            System.out.println("Database migration error: " + e.getMessage());
             return;
         }
+
         Scanner scanner = new Scanner(System.in);
 
-        ClientRepository repository = new JdbcClientRepository();
-        ClientService service;
+        ClientRepository clientRepository = new JdbcClientRepository();
+
+        ClientNoteRepository noteRepository =
+                new JdbcClientNoteRepository();
+
+        ClientService clientService;
+        ClientNoteService noteService;
+
         try {
-            service = new ClientService(repository);
-        } catch(DatabaseException e){
-            System.out.println("Database error during application startup :" + e.getMessage());
+            clientService = new ClientService(clientRepository);
+
+            noteService = new ClientNoteService(noteRepository, clientRepository);
+
+        } catch (DatabaseException e) {
+            System.out.println("Database error during application startup: " + e.getMessage());
+
             return;
         }
 
         while (true) {
 
+            System.out.println();
             System.out.println("CRM");
             System.out.println("1. Add Client");
             System.out.println("2. Get Clients");
-            System.out.println("3. Delete client");
+            System.out.println("3. Delete Client");
             System.out.println("4. Update Client");
-            System.out.println("5: Find Client by ID");
-            System.out.println("6: Exit");
+            System.out.println("5. Find Client by ID");
+            System.out.println("6. Add Client Note");
+            System.out.println("7. Get Client Notes");
+            System.out.println("8. Delete Client Note");
+            System.out.println("9. Exit");
 
-            int choise = scanner.nextInt();
+            int choice = scanner.nextInt();
             scanner.nextLine();
-            switch (choise) {
-                case 1:
 
-                    System.out.println("Name: ");
+            switch (choice) {
+
+                case 1: {
+                    System.out.println("Name:");
                     String name = scanner.nextLine();
-                    System.out.println("Phone: ");
+
+                    System.out.println("Phone:");
                     String phone = scanner.nextLine();
-                    System.out.println("Email: ");
+
+                    System.out.println("Email:");
                     String email = scanner.nextLine();
+
                     try {
-                        service.addClient(name, phone, email);
+                        clientService.addClient(name, phone, email);
                         System.out.println("Client added");
+
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
-                    } catch (DatabaseException e){
-                        System.out.println("Database error :" + e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println("Database error: " + e.getMessage());
                     }
 
                     break;
+                }
 
-                case 2:
-
+                case 2: {
                     try {
-                        System.out.println("Clients: ");
-                        for (Client client : service.getAllClients()) {
+                        System.out.println("Clients:");
+
+                        for (Client client : clientService.getAllClients()) {
                             System.out.println(client);
                         }
-                    } catch(DatabaseException e){
-                        System.out.println("Database error :" + e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println("Database error: " + e.getMessage());
                     }
 
                     break;
+                }
 
-                case 3:
-
-                    System.out.println("Print ID");
-                    int id = scanner.nextInt();
-                    try{
-                        if (service.deleteById(id)) System.out.println("Client deleted");
-                        else System.out.println("Client with that ID not found");
-                    } catch(DatabaseException e){
-                        System.out.println("Database error:" + e.getMessage());
-                    }
-                    break;
-                case 4:
-                    System.out.println("Print ID");
-                    int id2 = scanner.nextInt();
+                case 3: {
+                    System.out.println("Print client ID:");
+                    int clientId = scanner.nextInt();
                     scanner.nextLine();
-                    System.out.println("New Name: ");
-                    String Nname = scanner.nextLine();
-                    System.out.println("New Phone: ");
-                    String Nphone = scanner.nextLine();
-                    System.out.println("New Email: ");
-                    String Nemail = scanner.nextLine();
-                    boolean updatedC;
 
                     try {
-                        updatedC = service.updateClient(id2, Nname, Nphone, Nemail);
-                        if (updatedC) System.out.println("Client was updated");
-                        else System.out.println("Client not found");
+                        boolean deleted =
+                                clientService.deleteById(clientId);
+
+                        if (deleted) {
+                            System.out.println("Client deleted");
+                        } else {
+                            System.out.println(
+                                    "Client with that ID not found"
+                            );
+                        }
+
+                    } catch (DatabaseException e) {
+                        System.out.println(
+                                "Database error: " + e.getMessage()
+                        );
+                    }
+
+                    break;
+                }
+
+                case 4: {
+                    System.out.println("Print client ID:");
+                    int clientId = scanner.nextInt();
+                    scanner.nextLine();
+
+                    System.out.println("New Name:");
+                    String newName = scanner.nextLine();
+
+                    System.out.println("New Phone:");
+                    String newPhone = scanner.nextLine();
+
+                    System.out.println("New Email:");
+                    String newEmail = scanner.nextLine();
+
+                    try {
+                        boolean updated = clientService.updateClient(
+                                clientId,
+                                newName,
+                                newPhone,
+                                newEmail
+                        );
+
+                        if (updated) {
+                            System.out.println("Client was updated");
+                        } else {
+                            System.out.println("Client not found");
+                        }
+
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
-                    } catch(DatabaseException e){
-                        System.out.println("Database error :" + e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println(
+                                "Database error: " + e.getMessage()
+                        );
                     }
 
                     break;
+                }
 
-                case 5:
-
-                    System.out.println("Print ID:");
-                    id = scanner.nextInt();
+                case 5: {
+                    System.out.println("Print client ID:");
+                    int clientId = scanner.nextInt();
+                    scanner.nextLine();
 
                     try {
-                        Client clientg = service.findById(id);
-                        if (clientg != null) {
-                            System.out.println("Client: ");
-                            System.out.println(clientg);
+                        Client client =
+                                clientService.findById(clientId);
+
+                        if (client != null) {
+                            System.out.println("Client:");
+                            System.out.println(client);
                         } else {
                             System.out.println("Client is not found");
                         }
-                    } catch(DatabaseException e){
-                        System.out.println("Database error:" + e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println(
+                                "Database error: " + e.getMessage()
+                        );
                     }
 
                     break;
+                }
 
-                case 6:
+                case 6: {
+                    System.out.println("Print client ID:");
+                    int clientId = scanner.nextInt();
+                    scanner.nextLine();
 
+                    System.out.println("Note text:");
+                    String noteText = scanner.nextLine();
+
+                    try {
+                        noteService.addNote(clientId, noteText);
+                        System.out.println("Note added");
+
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println(
+                                "Database error: " + e.getMessage()
+                        );
+                    }
+
+                    break;
+                }
+
+                case 7: {
+                    System.out.println("Print client ID:");
+                    int clientId = scanner.nextInt();
+                    scanner.nextLine();
+
+                    try {
+                        System.out.println("Client notes:");
+
+                        for (ClientNote note :
+                                noteService.findByClientId(clientId)) {
+
+                            System.out.println(note);
+                        }
+
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println(
+                                "Database error: " + e.getMessage()
+                        );
+                    }
+
+                    break;
+                }
+
+                case 8: {
+                    System.out.println("Print note ID:");
+                    int noteId = scanner.nextInt();
+                    scanner.nextLine();
+
+                    try {
+                        boolean deleted =
+                                noteService.deleteById(noteId);
+
+                        if (deleted) {
+                            System.out.println("Note deleted");
+                        } else {
+                            System.out.println(
+                                    "Note with that ID not found"
+                            );
+                        }
+
+                    } catch (DatabaseException e) {
+                        System.out.println(
+                                "Database error: " + e.getMessage()
+                        );
+                    }
+
+                    break;
+                }
+
+                case 9: {
                     System.out.println("Exit");
+                    scanner.close();
                     return;
-            }
+                }
 
+                default: {
+                    System.out.println("Unknown menu command");
+                }
+            }
         }
     }
 }
