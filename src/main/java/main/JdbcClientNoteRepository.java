@@ -12,13 +12,23 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
 
     @Override
     public void save(ClientNote note) {
-        String sql = """
-            INSERT INTO client_notes (client_id, note_text)
-            VALUES (?, ?)
-            """;
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            save(connection, note);
+        } catch (SQLException e) {
+            throw new DatabaseException("Error while saving file", e);
+        }
+    }
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(
+    public void save(Connection connection, ClientNote note) throws SQLException {
+
+
+            String sql ="""
+                INSERT INTO client_notes (client_id, note_text)
+                VALUES (?, ?)
+                """;
+
+
+        try (PreparedStatement statement = connection.prepareStatement(
                      sql,
                      Statement.RETURN_GENERATED_KEYS
              )) {
@@ -37,17 +47,9 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
                     int generatedId = generatedKeys.getInt(1);
                     note.setId(generatedId);
                 } else {
-                    throw new SQLException(
-                            "Creating client note failed, no ID was generated"
-                    );
+                    throw new SQLException("Creating client note failed, no ID was generated");
                 }
             }
-
-        } catch (SQLException e) {
-            throw new DatabaseException(
-                    "Error while saving client note",
-                    e
-            );
         }
     }
 

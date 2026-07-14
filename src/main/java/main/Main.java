@@ -15,18 +15,20 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        ClientRepository clientRepository = new JdbcClientRepository();
+        JdbcClientRepository jdbcClientRepository =
+                new JdbcClientRepository();
 
-        ClientNoteRepository noteRepository =
+        JdbcClientNoteRepository jdbcNoteRepository =
                 new JdbcClientNoteRepository();
 
         ClientService clientService;
         ClientNoteService noteService;
+        ClientRegistrationService registrationService;
 
         try {
-            clientService = new ClientService(clientRepository);
-
-            noteService = new ClientNoteService(noteRepository, clientRepository);
+            clientService = new ClientService(jdbcClientRepository);
+            noteService = new ClientNoteService(jdbcNoteRepository, jdbcClientRepository);
+            registrationService = new ClientRegistrationService(jdbcClientRepository, jdbcNoteRepository);
 
         } catch (DatabaseException e) {
             System.out.println("Database error during application startup: " + e.getMessage());
@@ -46,7 +48,8 @@ public class Main {
             System.out.println("6. Add Client Note");
             System.out.println("7. Get Client Notes");
             System.out.println("8. Delete Client Note");
-            System.out.println("9. Exit");
+            System.out.println("9: Create client with note");
+            System.out.println("10. Exit");
 
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -164,8 +167,7 @@ public class Main {
                     scanner.nextLine();
 
                     try {
-                        Client client =
-                                clientService.findById(clientId);
+                        Client client = clientService.findById(clientId);
 
                         if (client != null) {
                             System.out.println("Client:");
@@ -260,10 +262,34 @@ public class Main {
                 }
 
                 case 9: {
-                    System.out.println("Exit");
-                    scanner.close();
-                    return;
+                    System.out.println("Print name");
+                    String name = scanner.nextLine();
+
+                    System.out.println("Print phone");
+                    String phone = scanner.nextLine();
+
+                    System.out.println("Print email");
+                    String email = scanner.nextLine();
+
+                    System.out.println("Print note text");
+                    String text = scanner.nextLine();
+
+                    try {
+                        registrationService.createClientWithFirstNote(name, phone, email, text);
+                        System.out.println("Client with note aded");
+
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+
+                    } catch (DatabaseException e) {
+                        System.out.println("Database error" + e.getMessage());
+                    }
                 }
+                    case 10: {
+                        System.out.println("Exit");
+                        scanner.close();
+                        return;
+                    }
 
                 default: {
                     System.out.println("Unknown menu command");

@@ -9,13 +9,20 @@ public class JdbcClientRepository implements ClientRepository {
 
     @Override
     public void save(Client client) {
+        try (Connection connection = DatabaseConnection.getConnection()) {
+            save(connection, client);
+        } catch (SQLException e) {
+            throw new DatabaseException("Error while saving file", e);
+        }
+    }
+
+    public void save(Connection connection, Client client) throws SQLException {
         String sql = """
             INSERT INTO clients (name, phone, email)
             VALUES (?, ?, ?)
             """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(
+        try (PreparedStatement statement = connection.prepareStatement(
                      sql,
                      Statement.RETURN_GENERATED_KEYS
              )) {
@@ -40,9 +47,6 @@ public class JdbcClientRepository implements ClientRepository {
                     );
                 }
             }
-
-        } catch (SQLException e) {
-            throw new DatabaseException("Error while saving client", e);
         }
     }
 
