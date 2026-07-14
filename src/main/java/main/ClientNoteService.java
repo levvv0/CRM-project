@@ -24,7 +24,7 @@ public class ClientNoteService {
         noteRepository.save(note);
     }
 
-    public ClientNote finById(int id){
+    public ClientNote findById(int id){
         return noteRepository.findById(id);
     }
 
@@ -33,7 +33,7 @@ public class ClientNoteService {
 
     }
 
-    public List<ClientNote> finAll(){
+    public List<ClientNote> findAll(){
         return noteRepository.findAll();
     }
 

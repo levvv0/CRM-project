@@ -145,7 +145,7 @@ public class JdbcClientRepository implements ClientRepository {
 
             statement.executeUpdate();
         } catch(SQLException e){
-            System.out.println("Error while updating client" + e.getMessage());
+            throw new DatabaseException("Error while updating client", e);
         }
     }
 

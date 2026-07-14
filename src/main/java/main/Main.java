@@ -284,9 +284,11 @@ public class Main {
                     } catch (DatabaseException e) {
                         System.out.println("Database error" + e.getMessage());
                     }
+                    break;
                 }
                     case 10: {
                         System.out.println("Exit");
+                        DatabaseConnection.closePool();
                         scanner.close();
                         return;
                     }
