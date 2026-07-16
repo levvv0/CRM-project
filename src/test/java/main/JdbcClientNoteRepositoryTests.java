@@ -2,7 +2,11 @@ package main;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+import javax.sql.DataSource;
 import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,19 +17,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class JdbcClientNoteRepositoryTests {
 
+    @Autowired
     private JdbcClientNoteRepository noteRepository;
+
+    @Autowired
     private JdbcClientRepository clientRepository;
 
+    @Autowired
+    DataSource dataSource;
     @BeforeEach
     void setUp() {
         System.setProperty("CRM_DB_URL", "jdbc:postgresql://localhost:5432/crm_test_db");
 
         DatabaseMigration.migrate();
-
-        noteRepository = new JdbcClientNoteRepository();
-        clientRepository = new JdbcClientRepository();
 
         clearTables();
 

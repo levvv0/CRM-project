@@ -9,14 +9,24 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class ClientRegistrationServiceTest {
 
+    @Autowired
     private JdbcClientRepository clientRepository;
+
+    @Autowired
     private JdbcClientNoteRepository noteRepository;
+
+    @Autowired
     private ClientRegistrationService regService;
 
     @BeforeAll
@@ -31,11 +41,6 @@ public class ClientRegistrationServiceTest {
 
     @BeforeEach
     void setUp() throws Exception{
-
-        clientRepository = new JdbcClientRepository();
-        noteRepository = new JdbcClientNoteRepository();
-
-        regService = new ClientRegistrationService(clientRepository, noteRepository);
 
         String sql = """
                 TRUNCATE TABLE client_notes, clients

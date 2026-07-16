@@ -4,15 +4,23 @@ import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import java.sql.Statement;
+import org.springframework.stereotype.Repository;
+import javax.sql.DataSource;
 
+@Repository
 public class JdbcClientRepository implements ClientRepository {
 
+    private final DataSource dataSource;
+    
+    public JdbcClientRepository(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
     @Override
     public void save(Client client) {
-        try (Connection connection = DatabaseConnection.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             save(connection, client);
         } catch (SQLException e) {
-            throw new DatabaseException("Error while saving file", e);
+            throw new DatabaseException("Error while saving client", e);
         }
     }
 
@@ -56,7 +64,7 @@ public class JdbcClientRepository implements ClientRepository {
         List<Client> clients = new ArrayList<>();
         String sql = "SELECT * FROM clients";
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -80,7 +88,7 @@ public class JdbcClientRepository implements ClientRepository {
 
         String sql = "SELECT * FROM clients WHERE id = ?";
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
@@ -106,7 +114,7 @@ public class JdbcClientRepository implements ClientRepository {
     public Client findByPhone(String phone){
         String sql = "SELECT * FROM clients WHERE phone = ?";
 
-        try(Connection connection = DatabaseConnection.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)){
 
             statement.setString(1, phone);
@@ -135,7 +143,7 @@ public class JdbcClientRepository implements ClientRepository {
                 SET name = ?, phone = ?, email = ?
                 WHERE id = ?""";
 
-        try(Connection connection = DatabaseConnection.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)){
 
             statement.setString(1, client.getName());
@@ -154,7 +162,7 @@ public class JdbcClientRepository implements ClientRepository {
 
         String sql = "DELETE FROM clients WHERE id = ?";
 
-        try(Connection connection = DatabaseConnection.getConnection();
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)){
 
             statement.setInt(1, id);

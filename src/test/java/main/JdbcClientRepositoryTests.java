@@ -10,16 +10,25 @@ import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import javax.sql.DataSource;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class JdbcClientRepositoryTests {
 
+    @Autowired
     private JdbcClientRepository repository;
+
+    @Autowired
+    private DataSource dataSource;
 
     @BeforeEach
     void setUp() {
         System.setProperty("CRM_DB_URL", "jdbc:postgresql://localhost:5432/crm_test_db");
         DatabaseMigration.migrate();
-        repository = new JdbcClientRepository();
         clearClientsTable();
     }
 
@@ -29,7 +38,7 @@ public class JdbcClientRepositoryTests {
             RESTART IDENTITY CASCADE
             """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.executeUpdate();

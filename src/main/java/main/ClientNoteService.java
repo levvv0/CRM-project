@@ -1,6 +1,8 @@
 package main;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ClientNoteService {
 
     private final ClientNoteRepository noteRepository;

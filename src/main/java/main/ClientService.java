@@ -1,6 +1,8 @@
 package main;
-
+import org.springframework.stereotype.Service;
 import java.util.List;
+
+@Service
 public class ClientService {
 
     private final ClientRepository repository;

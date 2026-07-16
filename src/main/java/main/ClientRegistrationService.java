@@ -1,14 +1,20 @@
 package main;
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.springframework.stereotype.Service;
+import javax.sql.DataSource;
+import javax.xml.crypto.Data;
 
+@Service
 public class ClientRegistrationService {
-    private JdbcClientNoteRepository noteRepository;
-    private JdbcClientRepository clientRepository;
+    private final JdbcClientNoteRepository noteRepository;
+    private final JdbcClientRepository clientRepository;
+    private final DataSource dataSource;
 
-    public ClientRegistrationService(JdbcClientRepository clientRepository, JdbcClientNoteRepository noteRepository){
+    public ClientRegistrationService(JdbcClientRepository clientRepository, JdbcClientNoteRepository noteRepository, DataSource dataSource){
        this.noteRepository = noteRepository;
        this.clientRepository = clientRepository;
+       this.dataSource = dataSource;
     }
 
     public void createClientWithFirstNote(String name, String phone, String email, String noteText){
@@ -19,7 +25,7 @@ public class ClientRegistrationService {
                 .SEmail(email)
                 .build();
 
-        try (Connection connection = DatabaseConnection.getConnection()){
+        try (Connection connection = dataSource.getConnection()){
             connection.setAutoCommit(false);
 
             try {

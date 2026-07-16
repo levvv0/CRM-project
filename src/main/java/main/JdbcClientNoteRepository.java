@@ -7,15 +7,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.Statement;
+import org.springframework.stereotype.Repository;
+import javax.sql.DataSource;
 
+@Repository
 public class JdbcClientNoteRepository implements ClientNoteRepository {
 
+    private final DataSource dataSource;
+
+    public JdbcClientNoteRepository(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
     @Override
     public void save(ClientNote note) {
-        try (Connection connection = DatabaseConnection.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             save(connection, note);
         } catch (SQLException e) {
-            throw new DatabaseException("Error while saving file", e);
+            throw new DatabaseException("Error while saving note", e);
         }
     }
 
@@ -61,7 +69,7 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
                 WHERE id = ?
                 """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
@@ -90,7 +98,7 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
 
         List<ClientNote> notes = new ArrayList<>();
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, clientId);
@@ -119,7 +127,7 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
 
         List<ClientNote> notes = new ArrayList<>();
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
 
@@ -142,7 +150,7 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
                 WHERE id = ?
                 """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
