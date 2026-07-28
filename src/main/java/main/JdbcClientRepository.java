@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.sql.Statement;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 @Repository
 public class JdbcClientRepository implements ClientRepository {
@@ -17,10 +18,15 @@ public class JdbcClientRepository implements ClientRepository {
     }
     @Override
     public void save(Client client) {
-        try (Connection connection = dataSource.getConnection()) {
+
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+        try {
             save(connection, client);
         } catch (SQLException e) {
             throw new DatabaseException("Error while saving client", e);
+
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
 

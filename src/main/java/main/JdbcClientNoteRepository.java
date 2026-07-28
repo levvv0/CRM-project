@@ -9,6 +9,7 @@ import java.util.List;
 import java.sql.Statement;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 @Repository
 public class JdbcClientNoteRepository implements ClientNoteRepository {
@@ -20,10 +21,17 @@ public class JdbcClientNoteRepository implements ClientNoteRepository {
     }
     @Override
     public void save(ClientNote note) {
-        try (Connection connection = dataSource.getConnection()) {
+
+        Connection connection = DataSourceUtils.getConnection(dataSource);
+
+        try {
             save(connection, note);
+
         } catch (SQLException e) {
             throw new DatabaseException("Error while saving note", e);
+
+        } finally {
+            DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
 
