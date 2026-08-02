@@ -16,6 +16,7 @@ public class JdbcClientRepository implements ClientRepository {
     public JdbcClientRepository(DataSource dataSource){
         this.dataSource = dataSource;
     }
+
     @Override
     public void save(Client client) {
 
@@ -56,9 +57,7 @@ public class JdbcClientRepository implements ClientRepository {
                     int generatedId = generatedKeys.getInt(1);
                     client.setId(generatedId);
                 } else {
-                    throw new SQLException(
-                            "Creating client failed, no ID was generated"
-                    );
+                    throw new SQLException("Creating client failed, no ID was generated");
                 }
             }
         }

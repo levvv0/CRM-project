@@ -29,11 +29,10 @@ public class JdbcClientNoteRepositoryTests {
 
     @Autowired
     DataSource dataSource;
+
     @BeforeEach
     void setUp() {
         System.setProperty("CRM_DB_URL", "jdbc:postgresql://localhost:5432/crm_test_db");
-
-        DatabaseMigration.migrate();
 
         clearTables();
 
@@ -133,7 +132,7 @@ public class JdbcClientNoteRepositoryTests {
             RESTART IDENTITY CASCADE
             """;
 
-        try (Connection connection = DatabaseConnection.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement =
                      connection.prepareStatement(sql)) {
 

@@ -1,14 +1,15 @@
 package main;
 
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,15 +30,8 @@ public class ClientRegistrationServiceTest {
     @Autowired
     private ClientRegistrationService regService;
 
-    @BeforeAll
-    static void configureTestDatabase() {
-        System.setProperty(
-                "CRM_DB_URL",
-                "jdbc:postgresql://localhost:5432/crm_test_db"
-        );
-
-        DatabaseMigration.migrate();
-    }
+    @Autowired
+    DataSource dataSource;
 
     @BeforeEach
     void setUp() throws Exception{
@@ -46,7 +40,8 @@ public class ClientRegistrationServiceTest {
                 TRUNCATE TABLE client_notes, clients
                 RESTART IDENTITY CASCADE
                 """;
-        try(Connection connection = DatabaseConnection.getConnection();
+
+        try(Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)){
             statement.executeUpdate();
         }

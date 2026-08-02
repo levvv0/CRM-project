@@ -8,8 +8,7 @@ public class ClientRegistrationService {
     private final ClientNoteRepository noteRepository;
     private final ClientRepository clientRepository;
 
-
-    public ClientRegistrationService(JdbcClientRepository clientRepository, JdbcClientNoteRepository noteRepository){
+    public ClientRegistrationService(ClientRepository clientRepository, ClientNoteRepository noteRepository){
        this.noteRepository = noteRepository;
        this.clientRepository = clientRepository;
     }
