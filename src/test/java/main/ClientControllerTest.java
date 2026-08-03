@@ -93,8 +93,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void createClient_shouldReturnCreated()
-            throws Exception {
+    void createClient_shouldReturnCreated() throws Exception {
 
         String json = """
             {
@@ -118,8 +117,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void createClient_shouldReturnBadRequest()
-            throws Exception {
+    void createClient_shouldReturnBadRequest() throws Exception {
 
         String json = """
             {
@@ -142,8 +140,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void updateClient_existingClient_shouldReturnNoContent()
-            throws Exception {
+    void updateClient_existingClient_shouldReturnNoContent() throws Exception {
 
         String json = """
             {
@@ -175,8 +172,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void updateClient_nonExistingClient_shouldReturnNotFound()
-            throws Exception {
+    void updateClient_nonExistingClient_shouldReturnNotFound() throws Exception {
 
         String json = """
             {
@@ -201,8 +197,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void deleteClient_existingClient_shouldReturnNoContent()
-            throws Exception {
+    void deleteClient_existingClient_shouldReturnNoContent() throws Exception {
 
         when(clientService.deleteById(1))
                 .thenReturn(true);
@@ -215,8 +210,7 @@ public class ClientControllerTest {
     }
 
     @Test
-    void deleteClient_nonExistingClient_shouldReturnNotFound()
-            throws Exception {
+    void deleteClient_nonExistingClient_shouldReturnNotFound() throws Exception {
 
         when(clientService.deleteById(999))
                 .thenReturn(false);
