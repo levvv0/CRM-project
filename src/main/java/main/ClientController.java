@@ -44,7 +44,7 @@ public class ClientController {
 
         boolean deleted = clientService.deleteById(id);
 
-        if(!deleted) ResponseEntity.notFound().build();
+        if(!deleted) return ResponseEntity.notFound().build();
 
         return ResponseEntity.noContent().build();
     }
