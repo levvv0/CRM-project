@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class ClientController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createClient(@RequestBody CreateClientRequest request){
+    public void createClient(@Valid @RequestBody CreateClientRequest request){
         clientService.addClient(request.name(), request.phone(), request.email());
     }
 
@@ -50,7 +51,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateClient(@PathVariable int id, @RequestBody UpdateClientRequest client){
+    public ResponseEntity<Void> updateClient(@PathVariable int id, @Valid @RequestBody UpdateClientRequest client){
 
         boolean updated = clientService.updateClient(id, client.name(), client.phone(), client.email());
 

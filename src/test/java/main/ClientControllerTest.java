@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @WebMvcTest(ClientController.class)
 public class ClientControllerTest {
@@ -127,9 +128,6 @@ public class ClientControllerTest {
             }
             """;
 
-        doThrow(new IllegalArgumentException("Name cannot be empty"))
-                .when(clientService)
-                .addClient("", "123", "lev@gmail.com");
 
         mockMvc.perform(post("/api/clients")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,6 +135,8 @@ public class ClientControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message")
                         .value("Name cannot be empty"));
+
+        verifyNoInteractions(clientService);
     }
 
     @Test
@@ -218,6 +218,27 @@ public class ClientControllerTest {
         mockMvc.perform(delete("/api/clients/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
+    }
+
+    @Test
+    void updateClient_emptyName_shouldReturnBadRequest() throws Exception{
+
+        String json = """
+            {
+              "name": "",
+              "phone": "456",
+              "email": "updated@gmail.com"
+            }
+            """;
+
+        mockMvc.perform(put("/api/clients/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("Name cannot be empty"));
+
+        verifyNoInteractions(clientService);
     }
 }
 

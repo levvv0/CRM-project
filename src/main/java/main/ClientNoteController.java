@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api")
 public class ClientNoteController {
@@ -17,7 +19,7 @@ public class ClientNoteController {
 
     @PostMapping("/clients/{clientId}/notes")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createNote(@PathVariable int clientId, @RequestBody CreateNoteRequest request){
+    public void createNote(@PathVariable int clientId, @Valid @RequestBody CreateNoteRequest request){
 
         noteService.addNote(clientId, request.noteText());
     }
