@@ -22,8 +22,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.mockito.Mockito.verifyNoInteractions;
+import main.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 
 @WebMvcTest(ClientController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(username = "admin", roles = "ADMIN")
 public class ClientControllerTest {
 
     @Autowired
