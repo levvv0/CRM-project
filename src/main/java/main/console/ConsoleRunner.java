@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.Scanner;
 
 @Component
-@Profile("!test")
+@Profile("console")
 public class ConsoleRunner implements CommandLineRunner {
 
     private final ClientService clientService;

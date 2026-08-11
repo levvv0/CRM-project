@@ -1,0 +1,38 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: crm-postgres
+
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${CRM_DB_PASSWORD}
+
+    volumes:
+      - crm-postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d crm_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    container_name: crm-container
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      CRM_DB_URL: jdbc:postgresql://postgres:5432/crm_db
+      CRM_DB_USERNAME: postgres
+      CRM_DB_PASSWORD: ${CRM_DB_PASSWORD}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  crm-postgres-data:
